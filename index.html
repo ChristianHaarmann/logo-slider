@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo Slider – Best Practice</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Syne:wght@700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e10;
+    --surface: #16161a;
+    --border: #2a2a30;
+    --accent: #e8ff47;
+    --text: #f0f0f0;
+    --muted: #666;
+    --logo-h: 48px;
+    --gap: 72px;
+    --speed: 50s;
+    --pause-resume-delay: 3500ms;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 60px 24px;
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; }
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 30%, #888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header p {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Slider Wrapper ── */
+  .slider-section {
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .slider-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .slider-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .slider-wrapper {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    /* Fade edges */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  }
+
+  /* ── Track ── */
+  .slider-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    padding: 28px 0;
+    gap: var(--gap);
+    animation: marquee var(--speed) linear infinite;
+    will-change: transform;
+    cursor: grab;
+  }
+
+  .slider-track:active { cursor: grabbing; }
+
+  /* Pause on hover */
+  .slider-wrapper:hover .slider-track,
+  .slider-track.paused {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(var(--translate-amount, -50%)); }
+  }
+
+  /* ── Logo Item ── */
+  .logo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--logo-h);
+    flex-shrink: 0;
+    padding: 0 4px;
+    transition: opacity 0.25s;
+    opacity: 0.45;
+    filter: grayscale(1);
+  }
+
+  .logo-item:hover {
+    opacity: 1;
+    filter: grayscale(0);
+  }
+
+  /* SVG Logo placeholders */
+  .logo-item svg {
+    height: 100%;
+    width: auto;
+  }
+
+  /* ── Controls ── */
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 0 4px;
+  }
+
+  .arrows {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+
+  .btn-arrow:hover {
+    background: #222228;
+    border-color: #444;
+    transform: scale(1.08);
+  }
+
+  .btn-arrow:active { transform: scale(0.95); }
+
+  .btn-arrow svg { width: 18px; height: 18px; }
+
+  /* ── Info Cards ── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+
+  .info-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .info-card p {
+    font-size: 0.82rem;
+    color: #aaa;
+    line-height: 1.5;
+  }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .slider-track {
+      animation: none;
+    }
+    .slider-wrapper {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 600px) {
+    :root { --logo-h: 36px; --gap: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Trusted by leading teams</h1>
+  <p>Bewege die Maus über den Slider, um zu pausieren · Pfeile für manuelle Kontrolle</p>
+</div>
+
+<!-- ── Slider ── -->
+<div class="slider-section">
+  <div class="slider-label">Partner & Kunden</div>
+
+  <div class="slider-wrapper" id="sliderWrapper">
+    <div class="slider-track" id="sliderTrack">
+      <!-- Logos werden per JS injiziert (original + Klon für Infinite Loop) -->
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="arrows">
+      <button class="btn-arrow" id="btnPrev" aria-label="Vorheriges Logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <button class="btn-arrow" id="btnNext" aria-label="Nächstes Logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Info Cards ── -->
+<div class="info-grid">
+  <div class="info-card">
+    <h3>Infinite Loop</h3>
+    <p>Track wird verdoppelt – kein Ruckeln beim Zurückspringen. Lautloser Reset via JS.</p>
+  </div>
+  <div class="info-card">
+    <h3>Hover = Pause</h3>
+    <p>Maus über Slider pausiert Animation direkt per CSS, kein JS nötig.</p>
+  </div>
+  <div class="info-card">
+    <h3>Bewusste Kontrolle</h3>
+    <p>1. Pfeil-Klick friert den Slider ein. Weitere Klicks navigieren je ein Logo weiter.</p>
+  </div>
+  <div class="info-card">
+    <h3>Reduced Motion</h3>
+    <p>Respektiert prefers-reduced-motion – Animation wird dann deaktiviert.</p>
+  </div>
+</div>
+
+<script>
+// ── Logo Data (SVG Inline Mockups) ──────────────────────────────────────────
+const logos = [
+  {
+    name: 'Vercel',
+    svg: `<svg viewBox="0 0 283 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Vercel">
+      <path d="M141.04 16c-11.04 0-19 7.2-19 18s8.08 18 20 18c6.67 0 11.93-2.45 15.78-7.35l-7.78-4.5c-2.06 2.78-5.14 4.44-8 4.44-4.72 0-8.33-2.94-9.29-7.44H162c.12-.84.2-1.71.2-2.65C162 23.3 153.92 16 141.04 16zm-9.24 14.27c.83-4.59 4.27-7.61 9.2-7.61 4.93 0 8.21 3.02 9.04 7.61H131.8zM186.18 28l-12.48-12H164v48h10V27.64l13.18 14.36h.28L200.7 27.4V64h10V16h-10L186.18 28zM232.78 16c-11.04 0-19 7.2-19 18s8.08 18 20 18c6.67 0 11.93-2.45 15.78-7.35l-7.78-4.5c-2.06 2.78-5.14 4.44-8 4.44-4.72 0-8.33-2.94-9.29-7.44H254c.12-.84.2-1.71.2-2.65C254.2 23.3 246.12 16 232.78 16zm-9.24 14.27c.83-4.59 4.27-7.61 9.2-7.61 4.93 0 8.21 3.02 9.04 7.61h-18.24zM280.44 19.36c-2.84-2.48-6.56-3.36-10.68-3.36-5.56 0-11.08 2.24-11.08 8.96 0 6.12 4.04 8.04 10.48 8.68 4 .4 5.84.96 5.84 3.08 0 2.2-2.28 2.92-5.16 2.92-3.04 0-6.24-1.24-8.28-3.92l-6.32 5.56c2.88 3.72 7.68 6.72 14.56 6.72 7.44 0 13.96-2.96 13.96-11.32 0-6.56-4.28-8.4-10.92-9.12-3.72-.4-5.36-.96-5.36-2.72 0-1.92 1.96-2.52 4.56-2.52 2.72 0 5.52 1.04 7.28 3.04l6.12-6zM32.36 48L0 0h10.48l21.88 34.04L54.24 0h10.48L32.36 48zM81.28 16c-11.04 0-19 7.2-19 18s8.08 18 20 18c6.67 0 11.93-2.45 15.78-7.35l-7.78-4.5c-2.06 2.78-5.14 4.44-8 4.44-4.72 0-8.33-2.94-9.29-7.44H103c.12-.84.2-1.71.2-2.65C103.2 23.3 95.12 16 81.28 16zm-9.24 14.27c.83-4.59 4.27-7.61 9.2-7.61 4.93 0 8.21 3.02 9.04 7.61H72.04z" fill="white"/>
+    </svg>`
+  },
+  {
+    name: 'Stripe',
+    svg: `<svg viewBox="0 0 120 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Stripe">
+      <text x="0" y="38" font-family="'Arial Black', sans-serif" font-size="42" font-weight="900" fill="white" letter-spacing="-2">stripe</text>
+    </svg>`
+  },
+  {
+    name: 'Figma',
+    svg: `<svg viewBox="0 0 80 50" xmlns="http://www.w3.org/2000/svg" aria-label="Figma">
+      <circle cx="15" cy="15" r="10" fill="#F24E1E"/>
+      <circle cx="35" cy="15" r="10" fill="#FF7262"/>
+      <circle cx="15" cy="35" r="10" fill="#A259FF"/>
+      <circle cx="35" cy="35" r="10" fill="#1ABCFE"/>
+      <circle cx="35" cy="25" r="10" fill="#0ACF83"/>
+      <text x="52" y="33" font-family="'Arial Black', sans-serif" font-size="20" font-weight="900" fill="white">fig</text>
+    </svg>`
+  },
+  {
+    name: 'Linear',
+    svg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" aria-label="Linear">
+      <defs>
+        <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#5E6AD2"/>
+          <stop offset="100%" stop-color="#8B5CF6"/>
+        </linearGradient>
+      </defs>
+      <circle cx="20" cy="20" r="16" fill="url(#lg1)"/>
+      <path d="M12 20 L20 12 L28 20 L20 28 Z" fill="white" opacity="0.9"/>
+      <text x="44" y="28" font-family="'Arial Black', sans-serif" font-size="22" font-weight="900" fill="white">Linear</text>
+    </svg>`
+  },
+  {
+    name: 'Notion',
+    svg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" aria-label="Notion">
+      <rect x="4" y="4" width="32" height="32" rx="6" fill="white"/>
+      <text x="9" y="30" font-family="Georgia, serif" font-size="24" font-weight="900" fill="black">N</text>
+      <text x="44" y="29" font-family="Georgia, serif" font-size="24" font-weight="700" fill="white">Notion</text>
+    </svg>`
+  },
+  {
+    name: 'Loom',
+    svg: `<svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg" aria-label="Loom">
+      <defs>
+        <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#625DF5"/>
+          <stop offset="100%" stop-color="#E1526C"/>
+        </linearGradient>
+      </defs>
+      <circle cx="20" cy="20" r="14" fill="url(#lg2)"/>
+      <circle cx="20" cy="20" r="6" fill="white"/>
+      <text x="42" y="28" font-family="'Arial Black', sans-serif" font-size="22" font-weight="900" fill="white">loom</text>
+    </svg>`
+  },
+  {
+    name: 'Slack',
+    svg: `<svg viewBox="0 0 110 40" xmlns="http://www.w3.org/2000/svg" aria-label="Slack">
+      <rect x="4" y="4" width="14" height="14" rx="4" fill="#E01E5A"/>
+      <rect x="22" y="4" width="14" height="14" rx="4" fill="#36C5F0"/>
+      <rect x="4" y="22" width="14" height="14" rx="4" fill="#2EB67D"/>
+      <rect x="22" y="22" width="14" height="14" rx="4" fill="#ECB22E"/>
+      <text x="46" y="29" font-family="'Arial Black', sans-serif" font-size="22" font-weight="900" fill="white">slack</text>
+    </svg>`
+  },
+  {
+    name: 'Framer',
+    svg: `<svg viewBox="0 0 110 40" xmlns="http://www.w3.org/2000/svg" aria-label="Framer">
+      <polygon points="6,4 26,4 26,22 6,22" fill="#0099FF"/>
+      <polygon points="6,22 26,22 6,40" fill="#0066CC"/>
+      <text x="34" y="30" font-family="'Arial Black', sans-serif" font-size="22" font-weight="900" fill="white">Framer</text>
+    </svg>`
+  },
+];
+
+// ── Build Track ──────────────────────────────────────────────────────────────
+const track = document.getElementById('sliderTrack');
+const logoItemWidth = 160; // estimated item width incl. gap
+
+function buildLogos(items) {
+  return items.map(logo => {
+    const el = document.createElement('div');
+    el.className = 'logo-item';
+    el.innerHTML = logo.svg;
+    el.setAttribute('title', logo.name);
+    return el;
+  });
+}
+
+// Original + Klon für infinite loop
+const originals = buildLogos(logos);
+const clones    = buildLogos(logos);
+
+originals.forEach(el => track.appendChild(el));
+clones.forEach(el => {
+  el.setAttribute('aria-hidden', 'true');
+  track.appendChild(el);
+});
+
+// ── CSS-Variable für translateAmount ────────────────────────────────────────
+// Die Animation soll genau 50% (Original-Hälfte) verschieben
+// Wir lassen CSS 50% rechnen (track enthält 2x die Logos)
+track.style.setProperty('--translate-amount', '-50%');
+
+// ── State ────────────────────────────────────────────────────────────────────
+let manuallyPaused = false;
+let currentOffset = 0;
+let isTransitioning = false;
+
+const ITEM_STEP = 160 + 72;
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function getAnimationProgress() {
+  const style = getComputedStyle(track);
+  const matrix = style.transform;
+  if (!matrix || matrix === 'none') return 0;
+  const match = matrix.match(/matrix.*\((.+)\)/);
+  if (!match) return 0;
+  const values = match[1].split(', ');
+  return parseFloat(values[4]) || 0;
+}
+
+// ── Step navigation ──────────────────────────────────────────────────────────
+function stepManual(direction) {
+  if (isTransitioning) return;
+
+  const currentX = getAnimationProgress();
+
+  if (!manuallyPaused) {
+    // Erster Klick: einfrieren ohne zu springen
+    track.style.animation  = 'none';
+    track.style.transition = 'none';
+    track.style.transform  = `translateX(${currentX}px)`;
+    currentOffset = currentX;
+    manuallyPaused = true;
+    return;
+  }
+
+  // Bereits eingefroren: einen Schritt navigieren
+  isTransitioning = true;
+
+  // Stille Normalisierung: currentOffset in den Bereich einer Logo-Runde bringen.
+  // Position 0 und -totalWidth sehen identisch aus (Original = Klon), kein visueller Sprung.
+  const totalWidth = logos.length * ITEM_STEP;
+  while (currentOffset <= -totalWidth) currentOffset += totalWidth;
+  while (currentOffset > 0)           currentOffset -= totalWidth;
+
+  // Zuerst normalisierte Position ohne Transition setzen …
+  track.style.transition = 'none';
+  track.style.transform  = `translateX(${currentOffset}px)`;
+
+  // … dann zwei rAF abwarten, damit der Browser die neue Position gerendert hat,
+  // bevor die Transition startet → kein Ruckeln
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    track.style.transition = 'transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    currentOffset += direction * -ITEM_STEP;
+    track.style.transform = `translateX(${currentOffset}px)`;
+
+    track.addEventListener('transitionend', function onEnd() {
+      track.removeEventListener('transitionend', onEnd);
+      isTransitioning = false;
+    }, { once: true });
+  }));
+}
+
+// ── Event Listeners ──────────────────────────────────────────────────────────
+document.getElementById('btnPrev').addEventListener('click', () => stepManual(-1));
+document.getElementById('btnNext').addEventListener('click', () => stepManual(1));
+
+// ── Reduced motion check ─────────────────────────────────────────────────────
+const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+if (mq.matches) {
+  track.style.animation = 'none';
+  console.info('Reduced motion: Slider animation disabled.');
+}
+</script>
+</body>
+</html>
